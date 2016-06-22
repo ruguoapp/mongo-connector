@@ -189,17 +189,20 @@ class DocManager(DocManagerBase):
 
         meta_collection_name = self._get_meta_collection(namespace)
 
-        self.meta_database[meta_collection_name].replace_one(
-            {self.id_field: doc['_id'], "ns": namespace},
-            {self.id_field: doc['_id'],
-             "_ts": timestamp,
-             "ns": namespace},
-             upsert=True)
+        if doc.has_key('_id'):
+            self.meta_database[meta_collection_name].replace_one(
+                {self.id_field: doc['_id'], "ns": namespace},
+                {self.id_field: doc['_id'],
+                 "_ts": timestamp,
+                 "ns": namespace},
+                 upsert=True)
 
-        self.mongo[database][coll].replace_one(
-            {'_id': doc['_id']},
-            doc,
-            upsert=True)
+            self.mongo[database][coll].replace_one(
+                {'_id': doc['_id']},
+                doc,
+                upsert=True)
+        else:
+            pass
 
     @wrap_exceptions
     def bulk_upsert(self, docs, namespace, timestamp):
